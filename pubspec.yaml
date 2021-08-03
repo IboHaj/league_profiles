@@ -34,6 +34,8 @@ dependencies:
   charts_flutter: ^0.10.0
   recase: ^4.0.0
   provider: ^5.0.0
+  connectivity_plus: ^1.0.6
+  internet_connection_checker: ^0.0.1+2
 
 
 

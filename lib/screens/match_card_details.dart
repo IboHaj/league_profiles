@@ -23,11 +23,12 @@ bool animate = true;
 class MatchDetails extends StatefulWidget {
   final String matchId;
   final String puuid;
-  MatchDetails(this.matchId, this.puuid);
+  final String gameMode;
+  MatchDetails(this.matchId, this.puuid, this.gameMode);
 
   @override
   _MatchDetailsState createState() =>
-      _MatchDetailsState(this.matchId, this.puuid);
+      _MatchDetailsState(this.matchId, this.puuid, this.gameMode);
 }
 
 class _MatchDetailsState extends State<MatchDetails> {
@@ -36,7 +37,8 @@ class _MatchDetailsState extends State<MatchDetails> {
   final client = http.Client();
   final String matchId;
   final String puuid;
-  _MatchDetailsState(this.matchId, this.puuid);
+  final String gameMode;
+  _MatchDetailsState(this.matchId, this.puuid, this.gameMode);
 
   @override
   void initState() {
@@ -252,11 +254,11 @@ class _MatchDetailsState extends State<MatchDetails> {
     final matchDetailsTimelineLocal = await fetch<Map<String, dynamic>>(
         client,
         Uri.parse(
-            'https://${Provider.of<SelectedRegion>(context).region == 'EUW' || Provider.of<SelectedRegion>(context).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}/timeline?api_key=$kApiKey'));
+            'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context , listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}/timeline?api_key=$kApiKey'));
     final matchDetailsLocal = await fetch<Map<String, dynamic>>(
         client,
         Uri.parse(
-            'https://${Provider.of<SelectedRegion>(context).region == 'EUW' || Provider.of<SelectedRegion>(context).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}?api_key=$kApiKey'));
+            'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}?api_key=$kApiKey'));
     matchDetailsTimeline = matchDetailsTimelineLocal;
     matchDetails = matchDetailsLocal;
     graph = HorizontalBarChart.createGraph(
@@ -273,19 +275,19 @@ class _MatchDetailsState extends State<MatchDetails> {
     for(var i in matchDetailsTimeline['info']['frames']){
       for (var j in i['events'] ){
         if(j['type'] == 'CHAMPION_KILL'){
-          timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['killerId'] - 1]['championName'], matchDetails['info']['participants'][j['killerId'] - 1]['summonerName'], 'Defeated', matchDetails['info']['participants'][j['victimId'] - 1]['championName'], matchDetails['info']['participants'][j['victimId'] - 1]['summonerName'], ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}')));
+          timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['killerId'] - 1]['championName'], matchDetails['info']['participants'][j['killerId'] - 1]['summonerName'], 'Defeated', matchDetails['info']['participants'][j['victimId'] - 1]['championName'], matchDetails['info']['participants'][j['victimId'] - 1]['summonerName'], ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
         }
         else if(j['type'] == 'WARD_PLACED'){
           if(j['wardType'] !=  'UNDEFINED'){
-            timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['creatorId'] - 1]['championName'], matchDetails['info']['participants'][j['creatorId'] - 1]['summonerName'], 'Warded', '3340', ((j['wardType']  == "YELLOW_TRINKET" ? "Ward" : "Stealth Ward" )), ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}')));
+            timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['creatorId'] - 1]['championName'], matchDetails['info']['participants'][j['creatorId'] - 1]['summonerName'], 'Warded', '3340', ((j['wardType']  == "YELLOW_TRINKET" ? "Ward" : "Stealth Ward" )), ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
           }
         }
         else if(j['type'] == 'WARD_KILLED'){
-          timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['creatorId'] - 1]['championName'], matchDetails['info']['participants'][j['creatorId'] - 1]['summonerName'], 'Removed', '3340', ((j['wardType']  == "YELLOW_TRINKET" ? "Ward" : "Stealth Ward" )), ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}')));
+          timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['creatorId'] - 1]['championName'], matchDetails['info']['participants'][j['creatorId'] - 1]['summonerName'], 'Removed', '3340', ((j['wardType']  == "YELLOW_TRINKET" ? "Ward" : "Stealth Ward" )), ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
         }
         else if(j['type'] == 'BUILDING_KILL'){
           if(j['buildingType'] == 'TOWER_BUILDING'){
-            timeLineWidgets.add(TimelineEvent((j['killerId'] - 1 > 0 ? matchDetails['info']['participants'][(j['killerId'] - 1)]['championName'] : j['teamId'] == 100 ? 'Minion-200' : 'Minion-100' ), 'Minions', 'Destroyed', j['teamId'] == 100 ? 'tower-200' : 'tower-100' , 'Turret', ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}')));
+            timeLineWidgets.add(TimelineEvent((j['killerId'] - 1 > 0 ? matchDetails['info']['participants'][(j['killerId'] - 1)]['championName'] : j['teamId'] == 100 ? 'Minion-200' : 'Minion-100' ), 'Minions', 'Destroyed', j['teamId'] == 100 ? 'tower-200' : 'tower-100' , 'Turret', ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
           }
         }
       }
@@ -301,11 +303,11 @@ class _MatchDetailsState extends State<MatchDetails> {
         child: Container(
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage('images/objectives_icons/map11.png'))),
-          alignment: Alignment(0 / 7435, -3500 / 7490),
+                  image: AssetImage('images/objectives_icons/map${gameMode == 'ARAM' ? '12' : '11'}.png'))),
+          alignment: Alignment(-(i.x - 7435) / 7435,  -(i.y - 7490) / 7490),
           child: Text(
             '.',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.red),
           ),
         ),
       ), headerValue: Row(
@@ -373,8 +375,9 @@ class Item {
 
 class TimelineEvent  {
   final String champ1,player1,champ2,player2,status,time;
+  final int x,y;
 
-  TimelineEvent(this.champ1 , this.player1, this.status, this.champ2, this.player2, this.time);
+  TimelineEvent(this.champ1 , this.player1, this.status, this.champ2, this.player2, this.time, this.x , this.y);
 }
 
 class ObjectivesWidget extends StatelessWidget {

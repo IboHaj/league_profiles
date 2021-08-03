@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:league_logger/screens/summoner_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,47 +36,6 @@ class _SearchNameState extends State<SearchName> {
     return jsonDecode(response.body);
   }
 
-  Future<http.Response> getLatestVersion(http.Client client) async {
-    final versionInfo = await client.get(
-        Uri.parse('https://ddragon.leagueoflegends.com/api/versions.json'));
-    return versionInfo;
-  }
-
-  Future<http.Response> getSummonerProfile(http.Client client) async {
-    final summonerInfo = await client.get(Uri.parse(
-        'https://$selectedRegionCode.api.riotgames.com/lol/summoner/v4/summoners/by-name/$summonerName?api_key=$kApiKey'));
-    return summonerInfo;
-  }
-
-  Future<http.Response> getSummonerRank(http.Client client) async {
-    final summonerInfo = await client.get(Uri.parse(
-        'https://$selectedRegionCode.api.riotgames.com/lol/league/v4/entries/by-summoner/${parsedProfile['id']}?api_key=$kApiKey'));
-    return summonerInfo;
-  }
-
-  Future<http.Response> getSummonerMastery(http.Client client) async {
-    final summonerInfo = await client.get(Uri.parse(
-        'https://$selectedRegionCode.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/${parsedProfile['id']}?api_key=$kApiKey'));
-    return summonerInfo;
-  }
-
-  Map<String, dynamic> parseJSONProfile(String body) {
-    return jsonDecode(body);
-  }
-
-  List<dynamic> parseJSONRank(String body) {
-    return jsonDecode(body);
-  }
-
-  List<dynamic> parseJSONMastery(String body) {
-    final mastery = jsonDecode(body);
-    parsedMastery = [];
-    for (var i = 0; i < 3; i++) {
-      parsedMastery.add(mastery[i]);
-    }
-    return parsedMastery;
-  }
-
   void setChampNames(List<dynamic> data, http.Client client, version) async {
     final champIDs = await client.get(Uri.parse(
         'http://ddragon.leagueoflegends.com/cdn/' +
@@ -95,6 +55,7 @@ class _SearchNameState extends State<SearchName> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<SelectedRegion>(context).region = selectedRegion;
     return MaterialApp(
       theme: kAppTheme,
       home: Scaffold(
@@ -197,7 +158,9 @@ class _SearchNameState extends State<SearchName> {
                         });
                       } catch (e) {
                         print(e);
-                        showAlertDialog(context);
+                        bool result =
+                            await InternetConnectionChecker().hasConnection;
+                        showAlertDialog(context, result);
                         nameController.clear();
                         setState(() {
                           showSpinner = false;
@@ -229,7 +192,7 @@ class _SearchNameState extends State<SearchName> {
     );
   }
 
-  showAlertDialog(BuildContext context) {
+  showAlertDialog(BuildContext context, bool connected) {
     // set up the button
     Widget okButton = TextButton(
       child: Text("OK"),
@@ -241,8 +204,9 @@ class _SearchNameState extends State<SearchName> {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
       title: Text(""),
-      content: Text(
-          "Please enter a correct summoner name and make sure the region selected is correct."),
+      content: Text(connected
+          ? "Please enter a correct summoner name and make sure the region selected is correct."
+          : "Please make sure you are connected to a network with an internet connection."),
       actions: [
         okButton,
       ],

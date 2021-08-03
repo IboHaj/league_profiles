@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:league_logger/widgets/match_history_card.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -28,17 +29,21 @@ class _MatchHistoryState extends State<MatchHistory> {
   _MatchHistoryState(this.summonerProfile);
   @override
   void initState() {
-    super.initState();
     startup();
+    super.initState();
   }
 
   void startup() async {
-    final mathHistoryIDs = await fetch<List<dynamic>>(
+    bool result = await InternetConnectionChecker().hasConnection;
+    if (result == false) {
+      showAlertDialog(context);
+    }
+    final matchHistoryIDs = await fetch<List<dynamic>>(
         client,
         Uri.parse(
-            'https://${Provider.of<SelectedRegion>(context).region == 'EUW' || Provider.of<SelectedRegion>(context).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=0&count=20&api_key=$kApiKey'),
+            'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=0&count=20&api_key=$kApiKey'),
         '');
-    this.matchHistoryIDs = mathHistoryIDs;
+    this.matchHistoryIDs = matchHistoryIDs;
     createCards(matchHistoryIDs);
   }
 
@@ -92,7 +97,7 @@ class _MatchHistoryState extends State<MatchHistory> {
           string = 'NEXUS BLITZ';
           break;
         }
-      case 1450:
+      case 1400:
         {
           string = 'ULTIMATE SPELLBOOK';
           break;
@@ -107,10 +112,14 @@ class _MatchHistoryState extends State<MatchHistory> {
   }
 
   void getMoreMatches() async {
+    bool result = await InternetConnectionChecker().hasConnection;
+    if (result == false) {
+      showAlertDialog(context);
+    }
     final moreMatches = await fetch<List<dynamic>>(
         client,
         Uri.parse(
-            'https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=${gamesNormal.length}&count=${gamesNormal.length + 20}&api_key=$kApiKey'),
+            'https://${Provider.of<SelectedRegion>(context).region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=${gamesNormal.length}&count=${gamesNormal.length + 20}&api_key=$kApiKey'),
         '');
     matchHistoryIDs = moreMatches;
     addCards(matchHistoryIDs);
@@ -123,10 +132,14 @@ class _MatchHistoryState extends State<MatchHistory> {
     var gamesRanked = <Widget>[];
     var gamesNormal = <Widget>[];
     for (var i in matchHistoryIDs) {
+      bool result = await InternetConnectionChecker().hasConnection;
+      if (result == false) {
+        showAlertDialog(context);
+      }
       var matchHistoryDetails = await fetch<Map<String, dynamic>>(
           client,
           Uri.parse(
-              'https://${Provider.of<SelectedRegion>(context).region == 'EUW' || Provider.of<SelectedRegion>(context).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/$i?api_key=$kApiKey'),
+              'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/$i?api_key=$kApiKey'),
           'info');
       for (var j in matchHistoryDetails['participants']) {
         if (j['puuid'] == summonerProfile['puuid']) {
@@ -156,7 +169,7 @@ class _MatchHistoryState extends State<MatchHistory> {
                 j['win'],
                 summonerProfile['puuid'],
                 i,
-                Provider.of<String>(context)[1]));
+                Provider.of<String>(context, listen: false)[1]));
           } else {
             gamesRanked.add(MatchHistoryCard(
                 j['championName'],
@@ -181,7 +194,7 @@ class _MatchHistoryState extends State<MatchHistory> {
                 j['win'],
                 summonerProfile['puuid'],
                 i,
-                Provider.of<String>(context)[1]));
+                Provider.of<String>(context, listen: false)[1]));
           }
         }
       }
@@ -203,10 +216,14 @@ class _MatchHistoryState extends State<MatchHistory> {
     var gamesRanked = <Widget>[];
     var gamesNormal = <Widget>[];
     for (var i in matchHistoryIDs) {
+      bool result = await InternetConnectionChecker().hasConnection;
+      if (result == false) {
+        showAlertDialog(context);
+      }
       var matchHistoryDetails = await fetch<Map<String, dynamic>>(
           client,
           Uri.parse(
-              'https://${Provider.of<SelectedRegion>(context).region == 'EUW' || Provider.of<SelectedRegion>(context).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/$i?api_key=$kApiKey'),
+              'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/$i?api_key=$kApiKey'),
           'info');
       for (var j in matchHistoryDetails['participants']) {
         if (j['puuid'] == summonerProfile['puuid']) {
@@ -236,7 +253,7 @@ class _MatchHistoryState extends State<MatchHistory> {
                 j['win'],
                 summonerProfile['puuid'],
                 i,
-                Provider.of<SelectedRegion>(context).region));
+                Provider.of<SelectedRegion>(context, listen: false).region));
           } else {
             gamesRanked.add(MatchHistoryCard(
                 j['championName'],
@@ -261,7 +278,7 @@ class _MatchHistoryState extends State<MatchHistory> {
                 j['win'],
                 summonerProfile['puuid'],
                 i,
-                Provider.of<SelectedRegion>(context).region));
+                Provider.of<SelectedRegion>(context, listen: false).region));
           }
         }
       }
@@ -350,6 +367,35 @@ class _MatchHistoryState extends State<MatchHistory> {
           ),
         ),
       ),
+    );
+  }
+
+  showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(""),
+      content: Text(
+          "Please make sure you are connected to a network with an internet connection."),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

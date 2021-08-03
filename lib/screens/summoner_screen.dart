@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:league_logger/screens/match_history.dart';
 import 'package:provider/provider.dart';
 import 'package:league_logger/constants.dart';
@@ -56,21 +57,33 @@ class _SummonerProfileState extends State<SummonerProfile> {
                             fontSize: 16,
                             color: Colors.white),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        bool result =
+                            await InternetConnectionChecker().hasConnection;
+                        if (result == false) {
+                          showAlertDialog(context);
+                        } else {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      MatchHistory(summonerInfo)));
+                        }
+                      }),
+                  IconButton(
+                    icon: Icon(Icons.keyboard_arrow_right_outlined),
+                    onPressed: () async {
+                      bool result =
+                          await InternetConnectionChecker().hasConnection;
+                      if (result == false) {
+                        showAlertDialog(context);
+                      } else {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
                                     MatchHistory(summonerInfo)));
-                      }),
-                  IconButton(
-                    icon: Icon(Icons.keyboard_arrow_right_outlined),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  MatchHistory(summonerInfo)));
+                      }
                     },
                   )
                 ],
@@ -259,6 +272,34 @@ class _SummonerProfileState extends State<SummonerProfile> {
           ),
         ),
       ),
+    );
+  }
+
+  showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(""),
+      content: Text(
+          "Please make sure you are connected to a network with an internet connection."),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

@@ -80,7 +80,7 @@ class MatchHistoryCard extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => MatchDetails(matchId, puuid)));
+                builder: (context) => MatchDetails(matchId, puuid, gameType)));
       },
       child: Container(
         decoration: BoxDecoration(
