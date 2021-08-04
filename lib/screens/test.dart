@@ -8,6 +8,8 @@ class ExperimentWidget extends StatefulWidget {
 class _ExperimentWidgetState extends State<ExperimentWidget> {
   @override
   Widget build(BuildContext context) {
+    print(((8282 - 7435) / 7435));
+    print(((8096 - 7490) / 7490));
     return MaterialApp(
       title: "THINGSZ",
       home: Scaffold(
@@ -26,13 +28,22 @@ class _ExperimentWidgetState extends State<ExperimentWidget> {
                     decoration: BoxDecoration(
                         image: DecorationImage(
                             image: AssetImage(
-                                'images/objectives_icons/map12.png'))),
-                    alignment:
-                        Alignment((5660 - 7435) / 7435, -(6237 - 7490) / 7490),
-                    child: Text(
-                      '.',
-                      style:
-                          TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                                'images/objectives_icons/map11.png'))),
+                    alignment: Alignment(
+                        ((6000 - 7435) / 7435), (-(6000 - 7490) / 7490)),
+                    // child: Text(
+                    //   '.',
+                    //   style: TextStyle(
+                    //       fontSize: 12,
+                    //       fontWeight: FontWeight.bold,
+                    //       color: Colors.red),
+                    // ),
+                    child: SizedBox(
+                      child: Image(
+                        image: AssetImage('images/champion_icons/LeeSin.png'),
+                      ),
+                      height: 10,
+                      width: 10,
                     ),
                   ),
                 ),

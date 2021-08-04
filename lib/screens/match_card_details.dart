@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:league_logger/screens/graphs.dart';
 import 'dart:convert';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -18,7 +19,6 @@ var matchDetails;
 var bar;
 var timeLineWidgets = <TimelineEvent>[];
 var expandedList = <Item>[];
-bool animate = true;
 
 class MatchDetails extends StatefulWidget {
   final String matchId;
@@ -38,6 +38,7 @@ class _MatchDetailsState extends State<MatchDetails> {
   final String matchId;
   final String puuid;
   final String gameMode;
+  bool showSpinner = false;
   _MatchDetailsState(this.matchId, this.puuid, this.gameMode);
 
   @override
@@ -47,7 +48,6 @@ class _MatchDetailsState extends State<MatchDetails> {
   }
 
   Widget build(BuildContext context) {
-    bool showSpinner = animate;
     return ModalProgressHUD(
       inAsyncCall: showSpinner,
       child: MaterialApp(
@@ -60,7 +60,8 @@ class _MatchDetailsState extends State<MatchDetails> {
                 icon: Icon(Icons.keyboard_arrow_left_outlined),
             color: Colors.white,
             onPressed: () {
-              Navigator.pop(context);
+                  matchDetails = null;
+                  Navigator.pop(context);
             }),
               title: Text(
                 'Match Details',
@@ -230,6 +231,34 @@ class _MatchDetailsState extends State<MatchDetails> {
       },
     );
   }
+  showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("OK"),
+      onPressed: () {
+        Navigator.pop(context);
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text(""),
+      content: Text(
+          "Please make sure you are connected to a network with an internet connection."),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 
   Future<http.Response> clientGet(http.Client client, Uri url) async {
     final response = await client.get(url);
@@ -251,23 +280,34 @@ class _MatchDetailsState extends State<MatchDetails> {
   }
 
   void startUp() async {
-    final matchDetailsTimelineLocal = await fetch<Map<String, dynamic>>(
-        client,
-        Uri.parse(
-            'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context , listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}/timeline?api_key=$kApiKey'));
-    final matchDetailsLocal = await fetch<Map<String, dynamic>>(
-        client,
-        Uri.parse(
-            'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}?api_key=$kApiKey'));
-    matchDetailsTimeline = matchDetailsTimelineLocal;
-    matchDetails = matchDetailsLocal;
-    graph = HorizontalBarChart.createGraph(
-        getGraphValues('Total Damage Dealt To Champions'));
-    bar = HorizontalBarChart.buildGraph(graph, true);
-    createTimelineEvents();
-    expandedList = createItemList();
     setState(() {
-      animate = false;
+      showSpinner = true;
+    });
+    try{
+      final matchDetailsTimelineLocal = await fetch<Map<String, dynamic>>(
+          client,
+          Uri.parse(
+              'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context , listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}/timeline?api_key=$kApiKey'));
+      final matchDetailsLocal = await fetch<Map<String, dynamic>>(
+          client,
+          Uri.parse(
+              'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/${this.matchId}?api_key=$kApiKey'));
+      matchDetailsTimeline = matchDetailsTimelineLocal;
+      matchDetails = matchDetailsLocal;
+      graph = HorizontalBarChart.createGraph(
+          getGraphValues('Total Damage Dealt To Champions'));
+      bar = HorizontalBarChart.buildGraph(graph, true);
+      createTimelineEvents();
+      expandedList = createItemList();
+    }
+    catch(e){
+      bool result = await InternetConnectionChecker().hasConnection;
+      if(result == false){
+        showAlertDialog(context);
+      }
+    }
+    setState(() {
+      showSpinner = false;
     });
   }
 
@@ -275,15 +315,12 @@ class _MatchDetailsState extends State<MatchDetails> {
     for(var i in matchDetailsTimeline['info']['frames']){
       for (var j in i['events'] ){
         if(j['type'] == 'CHAMPION_KILL'){
-          timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['killerId'] - 1]['championName'], matchDetails['info']['participants'][j['killerId'] - 1]['summonerName'], 'Defeated', matchDetails['info']['participants'][j['victimId'] - 1]['championName'], matchDetails['info']['participants'][j['victimId'] - 1]['summonerName'], ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
-        }
-        else if(j['type'] == 'WARD_PLACED'){
-          if(j['wardType'] !=  'UNDEFINED'){
-            timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['creatorId'] - 1]['championName'], matchDetails['info']['participants'][j['creatorId'] - 1]['summonerName'], 'Warded', '3340', ((j['wardType']  == "YELLOW_TRINKET" ? "Ward" : "Stealth Ward" )), ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
+          if(j['killerId'] - 1 == -1 ){
+            timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['victimId'] - 1]['championName'], matchDetails['info']['participants'][j['victimId'] - 1]['summonerName'], 'Executed', matchDetails['info']['participants'][j['victimId'] - 1]['championName'], matchDetails['info']['participants'][j['victimId'] - 1]['summonerName'], ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
           }
-        }
-        else if(j['type'] == 'WARD_KILLED'){
-          timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['creatorId'] - 1]['championName'], matchDetails['info']['participants'][j['creatorId'] - 1]['summonerName'], 'Removed', '3340', ((j['wardType']  == "YELLOW_TRINKET" ? "Ward" : "Stealth Ward" )), ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
+          else{
+            timeLineWidgets.add(TimelineEvent(matchDetails['info']['participants'][j['killerId'] - 1]['championName'], matchDetails['info']['participants'][j['killerId'] - 1]['summonerName'], 'Defeated', matchDetails['info']['participants'][j['victimId'] - 1]['championName'], matchDetails['info']['participants'][j['victimId'] - 1]['summonerName'], ('${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute : '0' + DateTime.fromMillisecondsSinceEpoch(j['timestamp']).minute.toString()}:${DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second > 9 ? DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second : '0'+DateTime.fromMillisecondsSinceEpoch(j['timestamp']).second.toString()}'), j['position']['x'], j['position']['y']));
+          }
         }
         else if(j['type'] == 'BUILDING_KILL'){
           if(j['buildingType'] == 'TOWER_BUILDING'){
@@ -304,11 +341,8 @@ class _MatchDetailsState extends State<MatchDetails> {
           decoration: BoxDecoration(
               image: DecorationImage(
                   image: AssetImage('images/objectives_icons/map${gameMode == 'ARAM' ? '12' : '11'}.png'))),
-          alignment: Alignment(-(i.x - 7435) / 7435,  -(i.y - 7490) / 7490),
-          child: Text(
-            '.',
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.red),
-          ),
+          alignment: Alignment((i.x - 7435) / 7435,  -(i.y - 7490) / 7490),
+          child: Icon(Icons.arrow_downward_rounded, color: Colors.black),
         ),
       ), headerValue: Row(
         mainAxisAlignment: MainAxisAlignment.center,

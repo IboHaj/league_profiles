@@ -157,7 +157,6 @@ class _SearchNameState extends State<SearchName> {
                           showSpinner = false;
                         });
                       } catch (e) {
-                        print(e);
                         bool result =
                             await InternetConnectionChecker().hasConnection;
                         showAlertDialog(context, result);

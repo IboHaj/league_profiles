@@ -34,17 +34,20 @@ class _MatchHistoryState extends State<MatchHistory> {
   }
 
   void startup() async {
-    bool result = await InternetConnectionChecker().hasConnection;
-    if (result == false) {
-      showAlertDialog(context);
+    try {
+      final matchHistoryIDs = await fetch<List<dynamic>>(
+          client,
+          Uri.parse(
+              'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=0&count=20&api_key=$kApiKey'),
+          '');
+      this.matchHistoryIDs = matchHistoryIDs;
+      createCards(matchHistoryIDs);
+    } catch (e) {
+      bool result = await InternetConnectionChecker().hasConnection;
+      if (result == false) {
+        showAlertDialog(context);
+      }
     }
-    final matchHistoryIDs = await fetch<List<dynamic>>(
-        client,
-        Uri.parse(
-            'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=0&count=20&api_key=$kApiKey'),
-        '');
-    this.matchHistoryIDs = matchHistoryIDs;
-    createCards(matchHistoryIDs);
   }
 
   Future<http.Response> clientGet(http.Client client, Uri url) async {
@@ -112,90 +115,98 @@ class _MatchHistoryState extends State<MatchHistory> {
   }
 
   void getMoreMatches() async {
-    bool result = await InternetConnectionChecker().hasConnection;
-    if (result == false) {
-      showAlertDialog(context);
-    }
-    final moreMatches = await fetch<List<dynamic>>(
-        client,
-        Uri.parse(
-            'https://${Provider.of<SelectedRegion>(context).region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=${gamesNormal.length}&count=${gamesNormal.length + 20}&api_key=$kApiKey'),
-        '');
-    matchHistoryIDs = moreMatches;
-    addCards(matchHistoryIDs);
     setState(() {
       showSpinner = true;
     });
+    try {
+      final moreMatches = await fetch<List<dynamic>>(
+          client,
+          Uri.parse(
+              'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/by-puuid/${summonerProfile['puuid']}/ids?start=${gamesNormal.length}&count=${gamesNormal.length + 20}&api_key=$kApiKey'),
+          '');
+      matchHistoryIDs = moreMatches;
+      addCards(matchHistoryIDs);
+      scrollUp(normalGamesScroll);
+      scrollUp(rankedGamesScroll);
+    } catch (e) {
+      bool result = await InternetConnectionChecker().hasConnection;
+      if (result == false) {
+        showAlertDialog(context);
+      }
+    }
   }
 
   void addCards(matchHistoryIDs) async {
     var gamesRanked = <Widget>[];
     var gamesNormal = <Widget>[];
     for (var i in matchHistoryIDs) {
-      bool result = await InternetConnectionChecker().hasConnection;
-      if (result == false) {
-        showAlertDialog(context);
-      }
-      var matchHistoryDetails = await fetch<Map<String, dynamic>>(
-          client,
-          Uri.parse(
-              'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/$i?api_key=$kApiKey'),
-          'info');
-      for (var j in matchHistoryDetails['participants']) {
-        if (j['puuid'] == summonerProfile['puuid']) {
-          print(matchHistoryDetails['queueId']);
-          if (matchHistoryDetails['queueId'] != 420 &&
-              matchHistoryDetails['queueId'] != 440) {
-            gamesNormal.add(MatchHistoryCard(
-                j['championName'],
-                j['summoner1Id'],
-                j['summoner2Id'],
-                j['perks']['styles'][0]['selections'][0]['perk'],
-                j['perks']['styles'][1]['style'],
-                j['kills'],
-                j['deaths'],
-                j['assists'],
-                j['champLevel'],
-                j['totalMinionsKilled'],
-                j['item0'],
-                j['item1'],
-                j['item2'],
-                j['item3'],
-                j['item4'],
-                j['item5'],
-                matchHistoryDetails['gameCreation'],
-                getGameType(matchHistoryDetails['queueId']),
-                matchHistoryDetails['gameduration'],
-                j['win'],
-                summonerProfile['puuid'],
-                i,
-                Provider.of<String>(context, listen: false)[1]));
-          } else {
-            gamesRanked.add(MatchHistoryCard(
-                j['championName'],
-                j['summoner1Id'],
-                j['summoner2Id'],
-                j['perks']['styles'][0]['selections'][0]['perk'],
-                j['perks']['styles'][1]['style'],
-                j['kills'],
-                j['deaths'],
-                j['assists'],
-                j['champLevel'],
-                j['totalMinionsKilled'],
-                j['item0'],
-                j['item1'],
-                j['item2'],
-                j['item3'],
-                j['item4'],
-                j['item5'],
-                matchHistoryDetails['gameCreation'],
-                getGameType(matchHistoryDetails['queueId']),
-                matchHistoryDetails['gameduration'],
-                j['win'],
-                summonerProfile['puuid'],
-                i,
-                Provider.of<String>(context, listen: false)[1]));
+      try {
+        var matchHistoryDetails = await fetch<Map<String, dynamic>>(
+            client,
+            Uri.parse(
+                'https://${Provider.of<SelectedRegion>(context, listen: false).region == 'EUW' || Provider.of<SelectedRegion>(context, listen: false).region == 'EUNE' ? 'europe' : 'americas'}.api.riotgames.com/lol/match/v5/matches/$i?api_key=$kApiKey'),
+            'info');
+        for (var j in matchHistoryDetails['participants']) {
+          if (j['puuid'] == summonerProfile['puuid']) {
+            print(matchHistoryDetails['queueId']);
+            if (matchHistoryDetails['queueId'] != 420 &&
+                matchHistoryDetails['queueId'] != 440) {
+              gamesNormal.add(MatchHistoryCard(
+                  j['championName'],
+                  j['summoner1Id'],
+                  j['summoner2Id'],
+                  j['perks']['styles'][0]['selections'][0]['perk'],
+                  j['perks']['styles'][1]['style'],
+                  j['kills'],
+                  j['deaths'],
+                  j['assists'],
+                  j['champLevel'],
+                  j['totalMinionsKilled'],
+                  j['item0'],
+                  j['item1'],
+                  j['item2'],
+                  j['item3'],
+                  j['item4'],
+                  j['item5'],
+                  matchHistoryDetails['gameCreation'],
+                  getGameType(matchHistoryDetails['queueId']),
+                  matchHistoryDetails['gameduration'],
+                  j['win'],
+                  summonerProfile['puuid'],
+                  i,
+                  Provider.of<SelectedRegion>(context, listen: false).region));
+            } else {
+              gamesRanked.add(MatchHistoryCard(
+                  j['championName'],
+                  j['summoner1Id'],
+                  j['summoner2Id'],
+                  j['perks']['styles'][0]['selections'][0]['perk'],
+                  j['perks']['styles'][1]['style'],
+                  j['kills'],
+                  j['deaths'],
+                  j['assists'],
+                  j['champLevel'],
+                  j['totalMinionsKilled'],
+                  j['item0'],
+                  j['item1'],
+                  j['item2'],
+                  j['item3'],
+                  j['item4'],
+                  j['item5'],
+                  matchHistoryDetails['gameCreation'],
+                  getGameType(matchHistoryDetails['queueId']),
+                  matchHistoryDetails['gameduration'],
+                  j['win'],
+                  summonerProfile['puuid'],
+                  i,
+                  Provider.of<SelectedRegion>(context, listen: false).region));
+            }
           }
+        }
+      } catch (e) {
+        bool result = await InternetConnectionChecker().hasConnection;
+        if (result == false) {
+          showAlertDialog(context);
         }
       }
     }
@@ -331,14 +342,38 @@ class _MatchHistoryState extends State<MatchHistory> {
                     color: Theme.of(context).scaffoldBackgroundColor,
                     child: NotificationListener<ScrollEndNotification>(
                       child: ListView(
-                        children: gamesNormal,
+                        children: gamesNormal.length == 0
+                            ? [
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 1.2,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Center(
+                                            child: Text(
+                                          'No ranked matches played within the last ${gamesNormal.length + 20} games',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white),
+                                        )),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ]
+                            : gamesNormal,
                         controller: normalGamesScroll,
                       ),
                       onNotification: (notification) {
                         if (normalGamesScroll.position.pixels ==
                             normalGamesScroll.position.maxScrollExtent) {
                           getMoreMatches();
-                          scrollUp(normalGamesScroll);
                         }
                         return true;
                       },
@@ -349,13 +384,37 @@ class _MatchHistoryState extends State<MatchHistory> {
                     child: NotificationListener<ScrollNotification>(
                       child: ListView(
                         controller: rankedGamesScroll,
-                        children: gamesRanked,
+                        children: gamesRanked.length == 0
+                            ? [
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height / 1.2,
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Center(
+                                            child: Text(
+                                          'No normal matches played within the last ${gamesRanked.length + 20} games',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white),
+                                        )),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ]
+                            : gamesRanked,
                       ),
                       onNotification: (notification) {
                         if (rankedGamesScroll.position.pixels ==
                             rankedGamesScroll.position.maxScrollExtent) {
                           getMoreMatches();
-                          scrollUp(rankedGamesScroll);
                         }
                         return true;
                       },
