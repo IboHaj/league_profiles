@@ -17,6 +17,7 @@ class MatchHistory extends StatefulWidget {
 }
 
 class _MatchHistoryState extends State<MatchHistory> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final client = http.Client();
   bool showSpinner = true;
   var gamesNormal = <Widget>[];
@@ -174,7 +175,8 @@ class _MatchHistoryState extends State<MatchHistory> {
                   j['win'],
                   summonerProfile['puuid'],
                   i,
-                  Provider.of<SelectedRegion>(context, listen: false).region));
+                  Provider.of<SelectedRegion>(context, listen: false).region,
+                  _scaffoldKey.currentContext));
             } else {
               gamesRanked.add(MatchHistoryCard(
                   j['championName'],
@@ -199,7 +201,8 @@ class _MatchHistoryState extends State<MatchHistory> {
                   j['win'],
                   summonerProfile['puuid'],
                   i,
-                  Provider.of<SelectedRegion>(context, listen: false).region));
+                  Provider.of<SelectedRegion>(context, listen: false).region,
+                  _scaffoldKey.currentContext));
             }
           }
         }
@@ -264,7 +267,8 @@ class _MatchHistoryState extends State<MatchHistory> {
                 j['win'],
                 summonerProfile['puuid'],
                 i,
-                Provider.of<SelectedRegion>(context, listen: false).region));
+                Provider.of<SelectedRegion>(context, listen: false).region,
+                _scaffoldKey.currentContext));
           } else {
             gamesRanked.add(MatchHistoryCard(
                 j['championName'],
@@ -289,7 +293,8 @@ class _MatchHistoryState extends State<MatchHistory> {
                 j['win'],
                 summonerProfile['puuid'],
                 i,
-                Provider.of<SelectedRegion>(context, listen: false).region));
+                Provider.of<SelectedRegion>(context, listen: false).region,
+                _scaffoldKey.currentContext));
           }
         }
       }
@@ -309,6 +314,7 @@ class _MatchHistoryState extends State<MatchHistory> {
         home: DefaultTabController(
           length: 2,
           child: Scaffold(
+            key: _scaffoldKey,
             appBar: AppBar(
               leading: IconButton(
                   icon: Icon(Icons.keyboard_arrow_left_outlined),

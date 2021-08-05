@@ -51,6 +51,7 @@ class _SearchNameState extends State<SearchName> {
       }
     }
     parsedMastery = data;
+    print(parsedMastery);
   }
 
   @override

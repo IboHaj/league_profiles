@@ -334,15 +334,19 @@ class _MatchDetailsState extends State<MatchDetails> {
   List<Item>createItemList(){
     List<Item> list = [];
     for(var i in timeLineWidgets){
-      list.add(Item(expandedValue: SizedBox(
-        height: 200,
-        width: 200,
-        child: Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('images/objectives_icons/map${gameMode == 'ARAM' ? '12' : '11'}.png'))),
-          alignment: Alignment((i.x - 7435) / 7435,  -(i.y - 7490) / 7490),
-          child: Icon(Icons.arrow_downward_rounded, color: Colors.black),
+      print(i.x);
+      print(i.y);
+      list.add(Item(expandedValue: Center(
+        child: SizedBox(
+          height: 200,
+          width: 200,
+          child: Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('images/objectives_icons/map${gameMode == 'ARAM' ? '12' : '11'}.png'))),
+            alignment: Alignment((i.x - 7435) / 7435,  -(i.y - 7490) / 7490),
+            child: SizedBox(height: 10, width: 10,child: Image(image: AssetImage('images/objectives_icons/arrow-199-128.png'),)),
+          ),
         ),
       ), headerValue: Row(
         mainAxisAlignment: MainAxisAlignment.center,

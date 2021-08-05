@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'dart:convert';
+
 import 'package:league_logger/screens/match_card_details.dart';
 
 class MatchHistoryCard extends StatelessWidget {
@@ -27,6 +29,7 @@ class MatchHistoryCard extends StatelessWidget {
       puuid,
       matchId,
       region;
+  final BuildContext parentWidgetReference;
   final client = http.Client();
 
   MatchHistoryCard(
@@ -52,7 +55,8 @@ class MatchHistoryCard extends StatelessWidget {
       this.endState,
       this.puuid,
       this.matchId,
-      this.region);
+      this.region,
+      this.parentWidgetReference);
 
   Future<http.Response> clientGet(http.Client client, Uri url) async {
     final response = await client.get(url);
@@ -75,11 +79,21 @@ class MatchHistoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     double KDA = (assists + kills) / deaths;
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MatchDetails(matchId, puuid, gameType)));
+      onTap: () async {
+        try {
+          bool result = await InternetConnectionChecker().hasConnection;
+          if (result == false) {
+            showAlertDialog(parentWidgetReference);
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        MatchDetails(matchId, puuid, gameType)));
+          }
+        } catch (e) {
+          print(e);
+        }
       },
       child: Container(
         decoration: BoxDecoration(
@@ -243,6 +257,27 @@ class MatchHistoryCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  showAlertDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext contextInside) {
+        return AlertDialog(
+          title: Text(""),
+          content: Text(
+              "Please make sure you are connected to a network with an internet connection."),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.pop(contextInside);
+              },
+            )
+          ],
+        );
+      },
     );
   }
 }

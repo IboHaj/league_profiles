@@ -30,7 +30,7 @@ class _ExperimentWidgetState extends State<ExperimentWidget> {
                             image: AssetImage(
                                 'images/objectives_icons/map11.png'))),
                     alignment: Alignment(
-                        ((6000 - 7435) / 7435), (-(6000 - 7490) / 7490)),
+                        ((2988 - 7435) / 7435), (-(12628 - 7490) / 7490)),
                     // child: Text(
                     //   '.',
                     //   style: TextStyle(
