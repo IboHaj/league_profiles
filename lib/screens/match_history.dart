@@ -363,7 +363,7 @@ class _MatchHistoryState extends State<MatchHistory> {
                                       children: [
                                         Center(
                                             child: Text(
-                                          'No ranked matches played within the last ${gamesNormal.length + 20} games',
+                                          'No normal matches played within the last ${gamesNormal.length + 20} games',
                                           style: TextStyle(
                                               fontSize: 16,
                                               color: Colors.white),
@@ -405,7 +405,7 @@ class _MatchHistoryState extends State<MatchHistory> {
                                       children: [
                                         Center(
                                             child: Text(
-                                          'No normal matches played within the last ${gamesRanked.length + 20} games',
+                                          'No ranked matches played within the last ${gamesRanked.length + 20} games',
                                           style: TextStyle(
                                               fontSize: 16,
                                               color: Colors.white),
