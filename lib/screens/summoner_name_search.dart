@@ -63,7 +63,7 @@ class _SearchNameState extends State<SearchName> {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text(
-            'League Logger',
+            'League Profiles',
             style: TextStyle(fontFamily: 'Friz Quadrata'),
           ),
           centerTitle: true,

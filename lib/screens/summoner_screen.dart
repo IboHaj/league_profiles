@@ -39,10 +39,6 @@ class _SummonerProfileState extends State<SummonerProfile> {
           ),
           title: Container(
             padding: EdgeInsets.only(right: 40),
-            child: Text(
-              'League Logger',
-              style: TextStyle(fontFamily: "Friz Quadrata"),
-            ),
           ),
           centerTitle: true,
           actions: [
