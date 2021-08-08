@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:league_logger/screens/summoner_screen.dart';
+import 'package:league_profiles/screens/summoner_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:league_logger/constants.dart';
+import 'package:league_profiles/constants.dart';
 import 'package:provider/provider.dart';
 
 class SearchName extends StatefulWidget {

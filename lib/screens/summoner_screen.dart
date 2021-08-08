@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:league_logger/screens/match_history.dart';
+import 'package:league_profiles/screens/match_history.dart';
 import 'package:provider/provider.dart';
-import 'package:league_logger/constants.dart';
+import 'package:league_profiles/constants.dart';
 
 class SummonerProfile extends StatefulWidget {
   final Map<String, dynamic> summonerInfo;

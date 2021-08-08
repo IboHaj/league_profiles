@@ -7,8 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:league_logger/main.dart';
+import 'package:league_profiles/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke graphs.dart',

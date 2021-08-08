@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'dart:convert';
-
-import 'package:league_logger/screens/match_card_details.dart';
+import 'package:league_profiles/screens/match_card_details.dart';
 
 class MatchHistoryCard extends StatelessWidget {
   final championIcon,

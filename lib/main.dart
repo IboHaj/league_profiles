@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:league_logger/screens/summoner_name_search.dart';
+import 'package:league_profiles/screens/summoner_name_search.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
 

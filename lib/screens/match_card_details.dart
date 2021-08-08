@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:league_logger/screens/graphs.dart';
+import 'package:league_profiles/screens/graphs.dart';
 import 'dart:convert';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:recase/recase.dart';
-import 'package:league_logger/constants.dart';
+import 'package:league_profiles/constants.dart';
 
 
 var plannedWidgets = <Widget>[];
