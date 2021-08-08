@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.league_profile">
+    package="com.example.league_profiles">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="league_profile"
+        android:label="League Profiles"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
