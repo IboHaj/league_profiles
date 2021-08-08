@@ -47,3 +47,5 @@ class Version {
   String version;
   Version(this.version);
 }
+
+// App was made by IboHaj
