@@ -11,7 +11,8 @@ ThemeData kAppTheme = ThemeData.light().copyWith(
 
 const TextStyle kTextStyle =
     TextStyle(fontFamily: 'Friz Quadrata', fontSize: 18);
-const String kApiKey = ''; // Insert your API key here
+const String kApiKey =
+    ''; // Insert your API key here
 const kRegionNames = ['EUNE', 'EUW', 'NA', 'OCE'];
 const kRegionCodes = ['eun1', 'euw1', 'na1', 'oc1'];
 const kOptionsGraph = <String>[

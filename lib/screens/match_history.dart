@@ -96,6 +96,11 @@ class _MatchHistoryState extends State<MatchHistory> {
           string = 'ARAM';
           break;
         }
+      case 1020:
+        {
+          string = 'ONE FOR ALL';
+          break;
+        }
       case 1300:
         {
           string = 'NEXUS BLITZ';
