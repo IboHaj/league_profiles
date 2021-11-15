@@ -96,6 +96,11 @@ class _MatchHistoryState extends State<MatchHistory> {
           string = 'ARAM';
           break;
         }
+      case 900:
+        {
+          string = 'URF';
+          break;
+        }
       case 1020:
         {
           string = 'ONE FOR ALL';
@@ -154,7 +159,6 @@ class _MatchHistoryState extends State<MatchHistory> {
             'info');
         for (var j in matchHistoryDetails['participants']) {
           if (j['puuid'] == summonerProfile['puuid']) {
-            print(matchHistoryDetails['queueId']);
             if (matchHistoryDetails['queueId'] != 420 &&
                 matchHistoryDetails['queueId'] != 440) {
               gamesNormal.add(MatchHistoryCard(
@@ -246,7 +250,6 @@ class _MatchHistoryState extends State<MatchHistory> {
           'info');
       for (var j in matchHistoryDetails['participants']) {
         if (j['puuid'] == summonerProfile['puuid']) {
-          print(matchHistoryDetails['queueId']);
           if (matchHistoryDetails['queueId'] != 420 &&
               matchHistoryDetails['queueId'] != 440) {
             gamesNormal.add(MatchHistoryCard(
@@ -316,6 +319,7 @@ class _MatchHistoryState extends State<MatchHistory> {
     return ModalProgressHUD(
       inAsyncCall: showSpinner,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: DefaultTabController(
           length: 2,
           child: Scaffold(

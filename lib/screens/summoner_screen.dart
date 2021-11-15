@@ -27,6 +27,7 @@ class _SummonerProfileState extends State<SummonerProfile> {
   Widget build(BuildContext context) {
     print(Provider.of<Version>(context, listen: false).version);
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: kAppTheme,
       home: Scaffold(
         appBar: AppBar(
@@ -91,7 +92,7 @@ class _SummonerProfileState extends State<SummonerProfile> {
           child: Container(
             child: Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).accentColor,
+                color: Theme.of(context).backgroundColor,
                 boxShadow: [
                   BoxShadow(
                       color: Colors.black, offset: Offset(0, 1), blurRadius: 6)

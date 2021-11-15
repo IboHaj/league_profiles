@@ -11,7 +11,10 @@ class MyApp extends StatelessWidget {
     SelectedRegion chosenRegion = SelectedRegion('');
     Version currentVersion = Version('');
     return MultiProvider(
-      child: MaterialApp(theme: kAppTheme, home: SearchName()),
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: kAppTheme,
+          home: SearchName()),
       providers: [
         Provider<SelectedRegion>(create: (context) => chosenRegion),
         Provider<Version>(create: (context) => currentVersion),

@@ -4,9 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:league_profiles/screens/graphs.dart';
-import 'dart:convert';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:recase/recase.dart';
 import 'package:league_profiles/constants.dart';
@@ -51,6 +49,7 @@ class _MatchDetailsState extends State<MatchDetails> {
     return ModalProgressHUD(
       inAsyncCall: showSpinner,
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: kAppTheme,
         home: DefaultTabController(
           length: 3,
@@ -157,30 +156,32 @@ class _MatchDetailsState extends State<MatchDetails> {
                       SizedBox(
                         height: 10,
                       ),
-                      Expanded(
-                        flex: 13,
-                        child: SingleChildScrollView(
-                          child: ExpansionPanelList(
-                            expansionCallback: (int index, bool isExpanded){
-                              setState(() {
-                                expandedList[index].isExpanded = !isExpanded;
-                              });
-                            },
-                            children: expandedList.map((Item) => ExpansionPanel(
-                              backgroundColor: Colors.white,
-                              isExpanded: Item.isExpanded,
-                              canTapOnHeader: true,
-                              headerBuilder: (BuildContext context, bool isExpanded) {
-                                return ListTile(title: Item.headerValue );
-                              }, body: ListTile(
-                              tileColor: Colors.white,
-                                  title: Item.expandedValue,
+                       Expanded(
+                         child: SingleChildScrollView(
+                            child: ExpansionPanelList(
+                              expansionCallback: (int index, bool isExpanded){
+                                setState(() {
+                                  expandedList[index].isExpanded = !isExpanded;
+                                });
+                              },
+                              children: expandedList.map((Item) => ExpansionPanel(
+                                backgroundColor: Colors.white,
+                                isExpanded: Item.isExpanded,
+                                canTapOnHeader: true,
+                                headerBuilder: (BuildContext context, bool isExpanded) {
+                                  return ListTile(title: Item.headerValue );
+                                }, body: ListTile(
+                                contentPadding: EdgeInsets.all(0),
+                                minVerticalPadding: 0,
+                                minLeadingWidth: 0,
+                                tileColor: Colors.white,
+                                    title: Item.expandedValue,
 
-                            ),
-                            )).toList(),
-                          )
-                        )
+                              ),
+                              )).toList(),
+                            )
                       ),
+                       ),
                     ],
                   ),
                 ),
@@ -260,15 +261,7 @@ class _MatchDetailsState extends State<MatchDetails> {
     );
   }
 
-  Future<http.Response> clientGet(http.Client client, Uri url) async {
-    final response = await client.get(url);
-    return response;
-  }
 
-  Future<T> fetch<T>(http.Client client, Uri url) async {
-    final response = await clientGet(client, url);
-    return jsonDecode(response.body);
-  }
 
   List<GraphValue> getGraphValues(String option) {
     List<GraphValue> values = [];
@@ -334,8 +327,6 @@ class _MatchDetailsState extends State<MatchDetails> {
   List<Item>createItemList(){
     List<Item> list = [];
     for(var i in timeLineWidgets){
-      print(i.x);
-      print(i.y);
       list.add(Item(expandedValue: Center(
         child: SizedBox(
           height: 200,
@@ -354,7 +345,7 @@ class _MatchDetailsState extends State<MatchDetails> {
         children: [
           Expanded(
             child: CircleAvatar(
-              radius: 15,
+              radius: 16,
               backgroundImage: AssetImage('images/champion_icons/${(i as TimelineEvent).champ1}.png'),
               backgroundColor: Colors.white,
             ),
@@ -371,13 +362,13 @@ class _MatchDetailsState extends State<MatchDetails> {
             child: Center(
               child: Text(
                 (i as TimelineEvent).status,
-                style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold, fontFamily: "Friz Quadrata"),
+                style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold, fontFamily: "Friz Quadrata"),
               ),
             ),
           ),
           Expanded(
             child: CircleAvatar(
-              radius: 15,
+              radius: 16,
               backgroundImage: AssetImage('images/champion_icons/${(i as TimelineEvent).champ2}.png'),
               backgroundColor: Colors.white,
             ),
@@ -390,7 +381,7 @@ class _MatchDetailsState extends State<MatchDetails> {
               ),
             ),
           ),
-          Expanded(child: Center(child: Text((i as TimelineEvent).time, style: TextStyle(fontSize: 11, color: Colors.black),)))
+          Expanded(flex: 1, child: Center(child: Text((i as TimelineEvent).time, style: TextStyle(fontSize: 11, color: Colors.black),)))
         ],
       ),));
     }

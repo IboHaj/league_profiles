@@ -11,6 +11,7 @@ class _ExperimentWidgetState extends State<ExperimentWidget> {
     print(((8282 - 7435) / 7435));
     print(((8096 - 7490) / 7490));
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: "THINGSZ",
       home: Scaffold(
         appBar: AppBar(
