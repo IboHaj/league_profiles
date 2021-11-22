@@ -97,7 +97,7 @@ Future<int> readCounter() async {
   }
 }
 
-void setChampNames(List<dynamic> data, http.Client client, version) async {
+Future setChampNames(List<dynamic> data, http.Client client, version) async {
   final champIDs = await client.get(Uri.parse(
       'http://ddragon.leagueoflegends.com/cdn/' +
           version +

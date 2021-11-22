@@ -181,7 +181,7 @@ class _SearchNameState extends State<SearchName> {
           client,
           Uri.parse(
               'https://$selectedRegionCode.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/${parsedProfile['id']}?api_key=$kApiKey'));
-      setChampNames(parsedMastery, client,
+      await setChampNames(parsedMastery, client,
           Provider.of<Version>(context, listen: false).version);
       parsedRank = await fetch(
           client,
